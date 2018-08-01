@@ -29,7 +29,7 @@ def rel_tof(dist):
 def resolution(dist,tof,del_tof):
     beta = dist/tof/c
     res = (E_n + mn)/E_n * beta**2/(1-beta**2) * np.sqrt((del_dist/dist)**2+(del_tof/tof)**2)
-    return res
+    return res     
 
 def fom(dist,tof):
     # want a value ~23 ns/m (tsoulifinidis)

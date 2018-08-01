@@ -4,16 +4,6 @@ import scipy.special as sp
 from scipy.optimize import curve_fit
 import pickle
 
-def gaus_exp_convo(x, *p):
-    '''not working so well...
-       tried reducing fit area of both neutron and gamma peaks, but it tends more toward the exponential
-       and does not fit the gaussian at the end well
-    '''
-    a, tau, mu, sigma = p
-    x_erf = (mu - tau*sigma**2 - x)/(np.sqrt(2.)*sigma)
-    func = a*np.exp(-tau*(mu - tau*sigma**2/2. - x))/2. * (1. + sp.erf(x_erf))
-    return func
-
 def gaussian( x, *p):
     c, mu, sigma = p
     res =   c * np.exp( - (x - mu)**2.0 / (2.0 * sigma**2.0) )
