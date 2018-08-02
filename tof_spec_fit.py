@@ -29,7 +29,7 @@ def print_stats():
 
 save_dir = 'C:/Users/raweldon/Research/TUNL/beam_char_runs/10_17_run/analysis/0deg_tof/plots/'
 # 11 MeV
-# dists = ['180', '256', '363']
+#dists = ['180', '256', '363']
 # 4 MeV
 dists = ['179','276','369']
 
@@ -39,6 +39,12 @@ dists = ['179','276','369']
 #g_ranges=[[400.,405.],[397.5,402.2],[394.,398.5]]
 #n_p0s = [[1.0, 341., 1.0],[1.0, 324., 1.0],[1.0,300.,1.0]]
 #g_p0s = [[1.0, 401., 0.1, 1.0, 403.5, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+
+#n_ranges=[[335.,345.],[320,330.],[290,310.]]
+#g_ranges=[[400.,404.],[397.,402.5],[390.,399.]]
+#n_p0s = [[1.0, 340., 1.0],[1.0, 324., 1.0],[1.0,300.,1.0]]
+#g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+
 # 4.8 MeV
 n_ranges=[[302.,307.],[269,275.],[240.5,246.]]
 g_ranges=[[390.,410.],[398.,402.2],[394.,398.5]]
@@ -105,5 +111,5 @@ for index,dist in enumerate(dists):
 #    plt.savefig(save_dir+dist+'cm_tof_fits.png',dpi=500)
 
 plt.show()
-#pickle.dump( means_stds, open( "peak_fit_params_11mev.p", "wb" ) )
-#print '\nparams saved to peak_fit_params_11mev.p'
+pickle.dump( means_stds, open( "peak_fit_params_11mev.p", "wb" ) )
+print '\nparams saved to peak_fit_params_11mev.p'

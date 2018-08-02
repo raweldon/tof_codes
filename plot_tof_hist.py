@@ -11,5 +11,5 @@ for dist in dists:
     tof = [i for i in tof if i<500 and i>200]
 
     plt.figure()
-    plt.hist(tof,bins=1e3,histtype='step')
+    plt.hist(tof,bins=1e4,histtype='step')
     plt.show()
