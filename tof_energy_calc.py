@@ -38,16 +38,16 @@ def fom(dist,tof):
 def rel_vel(T,m):
     return np.sqrt(c*(1.-(1./(1.+T/m))**2))
 
-peak_params = pickle.load( open('peak_fit_params.p','rb'))
+peak_params = pickle.load( open('peak_fit_params_11mev.p','rb'))
 
 tof_n = [peak_params[0][0],peak_params[2][0],peak_params[4][0]]
 tof_g1 = [peak_params[1][2],peak_params[3][0],peak_params[5][2]] # first gamma peak (in time), probably from colimator
 tof_g2 = [peak_params[1][0],peak_params[3][2],peak_params[5][0]] # second gamma peak (assuming this is from d cell interactions)
 
-dist = [175.8,234.9,284.3] # dist from det to end of beam line
+dist = [180.6,255.6,362.8] # dist from det to end of beam line
 dcel_length = 2.8575 # cm
 ej309_interaction = 2. # cm, avg interaction depth in 0 deg det
-dcel_to_beamend = 146.58 # measured by Ron Malone, 145.2 from our measurement
+dcel_to_beamend = 145.2 # 146.58 measured by Ron Malone, 145.2 from our measurement (2-18)
 dist_to_dcell = [dcel_to_beamend+dcel_length/2+ej309_interaction+d for d in dist] 
 n_mass = 1.008664 # u
 u_to_mev = 931.4941 # u = 931 MeV/c^2
@@ -71,7 +71,7 @@ del_tof = [0,0,0] # uncert should be sigma/sqrt(N) -> uncert in the mean is very
 tof = [tof_g2[i]+(dcel_to_beamend+dcel_length+ej309_interaction+dist[i])/c - n - d_vel*dcel_length/2 for i,n in enumerate(tof_n)]
 #print tof
 
-dists = ['175 cm', '235 cm', '284 cm']
+dists = ['180 cm', '256 cm', '363 cm']
 for i,t in enumerate(tof):
     print '--------------------------------------'
     print dists[i]

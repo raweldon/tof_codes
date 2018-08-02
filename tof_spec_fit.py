@@ -24,17 +24,29 @@ def build_hist(vals, bin_no):
     return hist,bin_centers
 
 def print_stats():
-    print "\nneutron gaussian fit:\n  mu1 = "+str(coeff[1])+" ns\n  sigma1 = "+str(coeff[2]
+    print "\ngamma gaussian fit:\n  mu1 = "+str(coeff[1])+" ns\n  sigma1 = "+str(coeff[2]
             )+" ns"+'\n  mu2 = '+str(coeff[4])+'\n  sigma2 = '+str(coeff[5])    
 
 save_dir = 'C:/Users/raweldon/Research/TUNL/beam_char_runs/10_17_run/analysis/0deg_tof/plots/'
-dists = ['175', '235', '284']
-# get vaules by inspection
-n_ranges=[[328.2,333.],[314.,318.5],[304,310]]
-g_ranges=[[388.5,393.5],[385.5,390.5],[384.5,390]]
-n_p0s = [[1.0, 329., 1.0],[1.0, 315., 1.0],[1.0,305.,1.0]]
-g_p0s = [[1.0, 389., 0.1, 1.0, 392., 0.1],[1.0, 387., 0.1, 1.0, 389., 0.1],[1.0, 385., 0.1, 1.0, 388., 0.1]]
+# 11 MeV
+# dists = ['180', '256', '363']
+# 4 MeV
+dists = ['179','276','369']
+
+# get vaules by inspection with plot_tof_hist.py
+# 11.325 MeV
+#n_ranges=[[340.,342.],[323.5,326.],[299.8,302.]]
+#g_ranges=[[400.,405.],[397.5,402.2],[394.,398.5]]
+#n_p0s = [[1.0, 341., 1.0],[1.0, 324., 1.0],[1.0,300.,1.0]]
+#g_p0s = [[1.0, 401., 0.1, 1.0, 403.5, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+# 4.8 MeV
+n_ranges=[[302.,307.],[269,275.],[240.5,246.]]
+g_ranges=[[390.,410.],[398.,402.2],[394.,398.5]]
+n_p0s = [[1.0, 302.5, 1.0],[1.0, 270., 1.0],[1.0,241.,1.0]]
+g_p0s = [[1.0, 401., 0.1, 1.0, 403.5, 0.1],[1.0, 398.3, 0.1, 1.0, 400., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+
 means_stds=[]
+
 for index,dist in enumerate(dists):
     tof_spec = np.load('dist_'+dist+'.npz')
     tof = tof_spec['data']
@@ -44,9 +56,9 @@ for index,dist in enumerate(dists):
     g_tof = get_range(tof, g_ranges[index][0], g_ranges[index][1])
     
     # build hists  
-    tof_hist, bin_centers = build_hist(tof, 5e3)
-    n_tof_hist, n_bin_centers = build_hist(n_tof, 300)
-    g_tof_hist, g_bin_centers = build_hist(g_tof, 300)
+    tof_hist, bin_centers = build_hist(tof, 1e3)
+    n_tof_hist, n_bin_centers = build_hist(n_tof, 500)
+    g_tof_hist, g_bin_centers = build_hist(g_tof, 500)
     
     # neutrons
     p0 = n_p0s[index]
@@ -84,7 +96,7 @@ for index,dist in enumerate(dists):
     plt.figure()
     # scale
     n_full_hist_fit = [n*max(tof_hist)/max(n_full_hist_fit) for n in n_full_hist_fit]
-    g_full_hist_fit = [g*max(tof_hist[3000:])/max(g_full_hist_fit) for g in g_full_hist_fit]
+    g_full_hist_fit = [g*max(tof_hist[len(tof_hist)*3./5.:])/max(g_full_hist_fit) for g in g_full_hist_fit]
     plt.plot(bin_centers,tof_hist)
     plt.plot(bin_centers, n_full_hist_fit, linewidth=2, linestyle='--')
     plt.plot(bin_centers, g_full_hist_fit, linewidth=2, linestyle='--')
@@ -93,4 +105,5 @@ for index,dist in enumerate(dists):
 #    plt.savefig(save_dir+dist+'cm_tof_fits.png',dpi=500)
 
 plt.show()
-#pickle.dump( means_stds, open( "peak_fit_params.p", "wb" ) )
+#pickle.dump( means_stds, open( "peak_fit_params_11mev.p", "wb" ) )
+#print '\nparams saved to peak_fit_params_11mev.p'
