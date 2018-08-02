@@ -1,8 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.special as sp
+from scipy.special import erfc
 from scipy.optimize import curve_fit
+import lmfit
 import pickle
+
+def gaus_exp_convo(x, *p):
+    '''not working so well...
+       tried reducing fit area of both neutron and gamma peaks, but it tends more toward the exponential
+       and does not fit the gaussian at the end well
+    '''
+    a, mu, sigma, tau = p
+    #print a, mu, sigma, tau
+    erf_arg = (mu + tau*sigma**2. - x)/np.sqrt(2.)/sigma
+    erf_arg = list(erf_arg)
+    func = tau/2. * np.exp(tau/2.*(2.*mu+tau*sigma**2.-2.*x)) * erfc(erf_arg)
+    return func
 
 def gaussian( x, *p):
     c, mu, sigma = p
@@ -13,6 +26,18 @@ def double_gauss(x, *p):
     A1, mu1, sigma1, A2, mu2, sigma2 = p
     res = A1*np.exp(-(x-mu1)**2/(2.*sigma1**2)) + A2*np.exp(-(x-mu2)**2/(2.*sigma2**2))
     return res
+
+def min_func(fit_params,y_vals,x_vals):
+    pars = fit_params.valuesdict()
+    a = pars['a']
+    mu = pars['mu']
+    sigma = pars['sigma']
+    #tau = pars['tau']
+
+    model = gaussian(x_vals,a,mu,sigma)
+    diff = y_vals - model
+    chi_sq = [x*x/np.sqrt(len(y_vals)) for x in diff]
+    return chi_sq   
 
 def get_range(vals, low_val, high_val):
     r = [i for i in vals if i>low_val and i<high_val]
@@ -29,9 +54,9 @@ def print_stats():
 
 save_dir = 'C:/Users/raweldon/Research/TUNL/beam_char_runs/10_17_run/analysis/0deg_tof/plots/'
 # 11 MeV
-#dists = ['180', '256', '363']
+dists = ['180', '256', '363']
 # 4 MeV
-dists = ['179','276','369']
+#dists = ['179','276','369']
 
 # get vaules by inspection with plot_tof_hist.py
 # 11.325 MeV
@@ -40,16 +65,16 @@ dists = ['179','276','369']
 #n_p0s = [[1.0, 341., 1.0],[1.0, 324., 1.0],[1.0,300.,1.0]]
 #g_p0s = [[1.0, 401., 0.1, 1.0, 403.5, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
 
-#n_ranges=[[335.,345.],[320,330.],[290,310.]]
-#g_ranges=[[400.,404.],[397.,402.5],[390.,399.]]
-#n_p0s = [[1.0, 340., 1.0],[1.0, 324., 1.0],[1.0,300.,1.0]]
-#g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+n_ranges=[[335.,345.],[320,330.],[290,310.]]
+g_ranges=[[400.,404.],[397.,402.5],[390.,399.]]
+n_p0s = [[1.0, 340., 1.0, 1.0],[1.0, 324., 1.0, 1.0],[1.0, 300., 1.0, 1.0]]
+g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
 
 # 4.8 MeV
-n_ranges=[[302.,307.],[269,275.],[240.5,246.]]
-g_ranges=[[390.,410.],[398.,402.2],[394.,398.5]]
-n_p0s = [[1.0, 302.5, 1.0],[1.0, 270., 1.0],[1.0,241.,1.0]]
-g_p0s = [[1.0, 401., 0.1, 1.0, 403.5, 0.1],[1.0, 398.3, 0.1, 1.0, 400., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+#n_ranges=[[302.,307.],[269,275.],[240.5,246.]]
+#g_ranges=[[390.,410.],[398.,402.2],[394.,398.5]]
+#n_p0s = [[1.0, 302.5, 1.0],[1.0, 270., 1.0],[1.0,241.,1.0]]
+#g_p0s = [[1.0, 401., 0.1, 1.0, 403.5, 0.1],[1.0, 398.3, 0.1, 1.0, 400., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
 
 means_stds=[]
 
@@ -68,7 +93,17 @@ for index,dist in enumerate(dists):
     
     # neutrons
     p0 = n_p0s[index]
-    coeff, var_matrix = curve_fit(gaussian, n_bin_centers, n_tof_hist, p0=p0)
+    fit_params = lmfit.Parameters()
+    fit_params.add('a', value=p0[0])
+    fit_params.add('mu', value=p0[1])
+    fit_params.add('sigma',value=p0[2])
+    #fit_params.add('tau',value=p0[3])
+
+    res = lmfit.minimize(min_func, fit_params, args=(n_tof_hist, n_bin_centers))#, nan_policy='omit')
+    print res.message
+    print lmfit.fit_report(res,show_correl=True)
+
+    coeff = (res.params['a'].value, res.params['mu'].value, res.params['sigma'].value)#, res.params['tau'].value)
     n_hist_fit = gaussian(n_bin_centers, *coeff)
     n_full_hist_fit = gaussian(bin_centers, *coeff)
     means_stds.append((coeff[1],coeff[2]))
@@ -111,5 +146,5 @@ for index,dist in enumerate(dists):
 #    plt.savefig(save_dir+dist+'cm_tof_fits.png',dpi=500)
 
 plt.show()
-pickle.dump( means_stds, open( "peak_fit_params_11mev.p", "wb" ) )
-print '\nparams saved to peak_fit_params_11mev.p'
+#pickle.dump( means_stds, open( "peak_fit_params_11mev.p", "wb" ) )
+#print '\nparams saved to peak_fit_params_11mev.p'

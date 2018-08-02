@@ -3,11 +3,9 @@ tof codes for oct 2017 and feb 2018 runs
 
 ## scripts
 tof_spec_fit.py - fits gaussians to neutron and gamma peaks   
-<<<<<<< HEAD
 tof_energy_calc.py - calculates energy and timing information
 
 ## additional info
-
-=======
-tof_energy_calc.py - calculates energy and timing information  
->>>>>>> 6975a8d7b13301e3bc21f0887777f196eddb65e7
+8/2/18 -- updated tof spectra on with daq2 codes
+          had not been including all events (had cut by evno -- removed this)
+          fixed multi peak issue for 11.3 MeV beam case

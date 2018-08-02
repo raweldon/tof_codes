@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-#dists = ['180','256','363']
-dists = ['179','276','369']
+dists = ['180','256','363']
+#dists = ['179','276','369']
 
 for dist in dists:
     tof_spec = np.load('dist_'+dist+'.npz')
