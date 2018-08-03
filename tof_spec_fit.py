@@ -1,3 +1,9 @@
+''' Code for fitting tof spectra 
+    Neutron spectrum - set gauss==True for guassian fit, gauss==False for guassian convoluted with a leading exponential
+    Gamma spectrum - fit with double guassian
+'''
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.special import erfc,erf
@@ -6,7 +12,6 @@ import lmfit
 import pickle
 
 def gaus_exp_convo(x, a, mu, sigma, tau):
-    ''' not any better than the gaussian fit'''
     erfc_arg = (sigma/tau - (x-mu)/sigma)/np.sqrt(2.)
     func = a*sigma/tau * np.sqrt(np.pi/2.) * np.exp(-(0.5*(sigma/tau)**2 - (x-mu)/tau)) * (1-erf(erfc_arg))
     return func
@@ -34,8 +39,11 @@ def print_stats():
     print "\ngamma gaussian fit:\n  mu1 = "+str(coeff[1])+" ns\n  sigma1 = "+str(coeff[2]
             )+" ns"+'\n  mu2 = '+str(coeff[4])+'\n  sigma2 = '+str(coeff[5])    
 
-save_dir = 'C:/Users/raweldon/Research/TUNL/beam_char_runs/10_17_run/analysis/0deg_tof/plots/'
-guass = False # true if guass fit, flase if guass-exp convolution fit
+save_dir = 'C:/Users/raweldon/Research/TUNL/git_programs/tof_codes/plots/'
+gauss = True # true if guass fit, flase if guass-exp convolution fit
+plt_save = False # if true save plots
+save_params = False # if true save params to pickle
+
 # 11 MeV
 dists = ['180', '256', '363']
 # 4 MeV
@@ -43,17 +51,28 @@ dists = ['180', '256', '363']
 
 # get vaules by inspection with plot_tof_hist.py
 # 11.325 MeV
-#guass ranges
-#n_ranges=[[338.5,341.5],[322.,325.],[298.5,301.5]]
-#g_ranges=[[400.,404.],[397.,402.5],[393.5,398.]]
-#n_p0s = [[1.0, 340., 1.0, 1.0],[1.0, 324., 1.0, 1.0],[1.0, 300., 1.0, 1.0]]
-#g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+# gauss ranges
+if gauss == True:
+    fit_type = 'gauss'
+    # values fit top of neutron spectrum
+#    n_ranges=[[338.5,341.5],[322.,325.],[298.5,301.5]]
+#    g_ranges=[[400.,404.],[397.,402.5],[393.5,398.]]
+#    n_p0s = [[1.0, 340., 1.0, 1.0],[1.0, 324., 1.0, 1.0],[1.0, 300., 1.0, 1.0]]
+#    g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+
+    # values fit right side of spectrum (early arriving neutrons)
+    n_ranges=[[339.7,345.5],[323.3,329.],[299.5,307.5]]
+    g_ranges=[[400.,404.],[397.,402.5],[393.5,398.]]
+    n_p0s = [[1.0, 340., 1.0, 1.0],[1.0, 324., 1.0, 1.0],[1.0, 300., 1.0, 1.0]]
+    g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
 
 # gauss_exp_convo ranges
-n_ranges=[[331.5,346.5],[317.,331.],[290.5,307.5]]
-g_ranges=[[400.,404.],[397.,402.5],[393.5,398.]]
-n_p0s = [[1.0, 340., 1.0, 1.0],[1.0, 324., 1.0, 1.0],[1.0, 300., 1.0, 1.0]]
-g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+else:
+    fit_type = 'gauss_exp_conv'
+    n_ranges=[[331.5,346.5],[317.,331.],[290.5,307.5]]
+    g_ranges=[[400.,404.],[397.,402.5],[393.5,398.]]
+    n_p0s = [[1.0, 340., 1.0, 1.0],[1.0, 324., 1.0, 1.0],[1.0, 300., 1.0, 1.0]]
+    g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
 
 # 4.8 MeV
 #n_ranges=[[302.,307.],[269,275.],[240.5,246.]]
@@ -62,7 +81,6 @@ g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.
 #g_p0s = [[1.0, 401., 0.1, 1.0, 403.5, 0.1],[1.0, 398.3, 0.1, 1.0, 400., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
 
 means_stds=[]
-
 for index,dist in enumerate(dists):
     tof_spec = np.load('dist_'+dist+'.npz')
     tof = tof_spec['data']
@@ -78,7 +96,7 @@ for index,dist in enumerate(dists):
     
     # neutrons
     p0 = n_p0s[index]
-    if guass == True:
+    if gauss == True:
         gmodel = lmfit.Model(gaussian)
         params = gmodel.make_params(a=1000,mu=p0[1],sigma=p0[2])
     
@@ -119,20 +137,25 @@ for index,dist in enumerate(dists):
     print_stats()
     
     # gamma plot
-    plt.figure()
+    fig1, ax1 = plt.subplots()
     plt.plot(g_bin_centers, g_tof_hist)
     plt.plot(g_bin_centers, g_hist_fit) 
     plt.ylabel('counts')
     plt.xlabel('time (ns)')
-#    plt.savefig(save_dir+dist+'cm_g_fit.png',dpi=500)
+    plt.text(0.7,0.75,'$\mu_1 = $'+str(round(means_stds[1+2*index][0],3))+'\n$\sigma_1 =$ '+str(round(means_stds[1+2*index][1],3))+'\n$\mu_2 =$ '+
+             str(round(means_stds[1+2*index][2],3))+'\n$\sigma_2 =$ '+str(round(means_stds[1+2*index][3],3)), transform=ax1.transAxes)
+    if plt_save == True:
+        plt.savefig(save_dir+fit_type+'_'+dist+'cm_g_fit.png',dpi=500)
 
     # neutron plot    
-    plt.figure()
+    fig2, ax2 = plt.subplots()
     plt.plot(n_bin_centers, n_tof_hist)
     plt.plot(n_bin_centers, n_hist_fit, label='convo')
     plt.ylabel('counts')
     plt.xlabel('time (ns)')
-#    plt.savefig(save_dir+dist+'cm_n_git.png',dpi=500)
+    plt.text(0.7,0.75,'$\mu =$ '+str(round(means_stds[0+2*index][0],3))+'\n$\sigma =$ '+str(round(means_stds[0+2*index][1],3)), transform=ax2.transAxes)
+    if plt_save == True:    
+        plt.savefig(save_dir+fit_type+'_'+dist+'cm_n_fit.png',dpi=500)
 
     # full
     plt.figure()
@@ -144,8 +167,10 @@ for index,dist in enumerate(dists):
     plt.plot(bin_centers, g_full_hist_fit, linewidth=2, linestyle='--')
     plt.ylabel('counts')
     plt.xlabel('time (ns)')
-#    plt.savefig(save_dir+dist+'cm_tof_fits.png',dpi=500)
+    if plt_save == True:
+        plt.savefig(save_dir+fit_type+'_'+dist+'cm_tof_fits.png',dpi=500)
 
 plt.show()
-#pickle.dump( means_stds, open( "peak_fit_params_11mev.p", "wb" ) )
-#print '\nparams saved to peak_fit_params_11mev.p'
+if save_params == True:
+    pickle.dump( means_stds, open( "peak_fit_params_11mev_"+fit_type+".p", "wb" ) )
+    print '\nparams saved to peak_fit_params_11mev_'+fit_type+'.p'
