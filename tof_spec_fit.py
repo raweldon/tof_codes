@@ -1,13 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.special import erfc
+from scipy.special import erfc,erf
 from scipy.optimize import curve_fit
 import lmfit
 import pickle
 
 def gaus_exp_convo(x, a, mu, sigma, tau):
+    ''' not any better than the gaussian fit'''
     erfc_arg = (sigma/tau - (x-mu)/sigma)/np.sqrt(2.)
-    func = a*sigma/tau * np.sqrt(np.pi/2.) * np.exp(0.5*(sigma/tau)**2 - (x-mu)/tau) * erfc(erfc_arg)
+    func = a*sigma/tau * np.sqrt(np.pi/2.) * np.exp(-(0.5*(sigma/tau)**2 - (x-mu)/tau)) * (1-erf(erfc_arg))
     return func
 
 def gaussian( x, a, mu, sigma):
@@ -34,6 +35,7 @@ def print_stats():
             )+" ns"+'\n  mu2 = '+str(coeff[4])+'\n  sigma2 = '+str(coeff[5])    
 
 save_dir = 'C:/Users/raweldon/Research/TUNL/beam_char_runs/10_17_run/analysis/0deg_tof/plots/'
+guass = False # true if guass fit, flase if guass-exp convolution fit
 # 11 MeV
 dists = ['180', '256', '363']
 # 4 MeV
@@ -41,13 +43,15 @@ dists = ['180', '256', '363']
 
 # get vaules by inspection with plot_tof_hist.py
 # 11.325 MeV
-#n_ranges=[[340.,342.],[323.5,326.],[299.8,302.]]
-#g_ranges=[[400.,405.],[397.5,402.2],[394.,398.5]]
-#n_p0s = [[1.0, 341., 1.0],[1.0, 324., 1.0],[1.0,300.,1.0]]
-#g_p0s = [[1.0, 401., 0.1, 1.0, 403.5, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+#guass ranges
+#n_ranges=[[338.5,341.5],[322.,325.],[298.5,301.5]]
+#g_ranges=[[400.,404.],[397.,402.5],[393.5,398.]]
+#n_p0s = [[1.0, 340., 1.0, 1.0],[1.0, 324., 1.0, 1.0],[1.0, 300., 1.0, 1.0]]
+#g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
 
-n_ranges=[[335.,345.],[320,330.],[290,310.]]
-g_ranges=[[400.,404.],[397.,402.5],[390.,399.]]
+# gauss_exp_convo ranges
+n_ranges=[[331.5,346.5],[317.,331.],[290.5,307.5]]
+g_ranges=[[400.,404.],[397.,402.5],[393.5,398.]]
 n_p0s = [[1.0, 340., 1.0, 1.0],[1.0, 324., 1.0, 1.0],[1.0, 300., 1.0, 1.0]]
 g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
 
@@ -69,22 +73,40 @@ for index,dist in enumerate(dists):
     
     # build hists  
     tof_hist, bin_centers = build_hist(tof, 1e3)
-    n_tof_hist, n_bin_centers = build_hist(n_tof, 500)
-    g_tof_hist, g_bin_centers = build_hist(g_tof, 500)
+    n_tof_hist, n_bin_centers = build_hist(n_tof, 1000)
+    g_tof_hist, g_bin_centers = build_hist(g_tof, 1000)
     
     # neutrons
     p0 = n_p0s[index]
-    gmodel = lmfit.Model(gaus_exp_convo)
-    params = gmodel.make_params(a=1000,mu=p0[1],sigma=p0[2],tau=p0[3])
+    if guass == True:
+        gmodel = lmfit.Model(gaussian)
+        params = gmodel.make_params(a=1000,mu=p0[1],sigma=p0[2])
+    
+        res = gmodel.fit(n_tof_hist, params, x=n_bin_centers, nan_policy='omit')
+        print '\nFitting with LMFIT'
+        print res.message
+        print lmfit.fit_report(res,show_correl=True)
+    
+        coeff = (res.params['a'].value, res.params['mu'].value, res.params['sigma'].value)
+        n_hist_fit = gaussian(n_bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value)
+        n_full_hist_fit = gaussian(bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value)
 
-    res = gmodel.fit(n_tof_hist, params, x=n_bin_centers, nan_policy='omit')
-    print '\nFitting with LMFIT'
-    print res.message
-    print lmfit.fit_report(res,show_correl=True)
+    else:
+        gmodel = lmfit.Model(gaus_exp_convo)
+        params = gmodel.make_params(a=1000,mu=p0[1],sigma=p0[2],tau=p0[3])
 
-    coeff = (res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
-    n_hist_fit = gaus_exp_convo(n_bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
-    n_full_hist_fit = gaus_exp_convo(bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
+        res = gmodel.fit(n_tof_hist, params, x=n_bin_centers, nan_policy='omit')
+        print '\nFitting with LMFIT'
+        print res.message
+        print lmfit.fit_report(res,show_correl=True)
+
+        coeff = (res.params['a'].value, res.params['mu'].value, res.params['sigma'].value)#, res.params['tau'].value)
+        n_hist_fit = gaussian(n_bin_centers, *coeff)
+        n_full_hist_fit = gaussian(bin_centers, *coeff)
+        coeff = (res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
+        n_hist_fit = gaus_exp_convo(n_bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
+        n_full_hist_fit = gaus_exp_convo(bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
+
     means_stds.append((coeff[1],coeff[2]))
     print "\nneutron gaussian fit:\n  mu = "+str(coeff[1])+" ns\n  sigma = "+str(coeff[2])
 
