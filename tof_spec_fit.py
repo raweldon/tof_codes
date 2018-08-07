@@ -150,109 +150,73 @@ for index,dist in enumerate(dists):
                                                               res.params['a2'].value, res.params['mu2'].value, res.params['sigma2'].value,
                                                               res.params['a3'].value, res.params['mu3'].value, res.params['sigma3'].value, res.params['m'].value, res.params['b'].value )
     else:
-        exp_mod = lmfit.models.ExponentialModel(prefix='exp_')
-        params = exp_mod.guess(g_tof_hist, x=g_bin_centers)
+        gmodel = lmfit.Model(triple_gaus_exp_convo)
+        gmodel.set_param_hint('mu_1',value=p0[1], min=g_mu_min[index][0], max=g_mu_max[index][0])
+        gmodel.set_param_hint('mu_2', value=p0[5], min=g_mu_min[index][1], max=g_mu_max[index][1])
+        gmodel.set_param_hint('mu_3', value=p0[9], min=g_mu_min[index][2], max=g_mu_max[index][2])
+        gmodel.set_param_hint('sigma_1', value=p0[2], min=0.5, max=5.)
+        gmodel.set_param_hint('sigma_2', value=p0[6], min=0.5, max=5.)
+        gmodel.set_param_hint('sigma_3', value=p0[10], min=0.5, max=5.)
+        gmodel.set_param_hint('a_1', value=p0[0], min=1.0)
+        gmodel.set_param_hint('a_2', value=p0[4], min=1.0)
+        gmodel.set_param_hint('a_3', value=p0[8], min=1.0)
+        gmodel.set_param_hint('tau_1', value=p0[3], min=1., max=10.)
+        gmodel.set_param_hint('tau_2', value=p0[7], min=1., max=10.)
+        gmodel.set_param_hint('tau_3', value=p0[11], min=1., max=10.)
+        params = gmodel.make_params(m=0.1, b=40.)
 
-        line_mod = lmfit.models.LinearModel(prefix='line_')
-        params.update(line_mod.guess(g_tof_hist, x=g_bin_centers))
-
-        gauss_1 = lmfit.models.GaussianModel(prefix='g1_')
-        params.update(gauss_1.make_params())
-        params['g1_center'].set(value=p0[1], min=g_mu_min[index][0], max=g_mu_max[index][0])
-        params['g1_sigma'].set(value=p0[2], min=0.5, max=5.)
-        params['g1_amplitude'].set(value=p0[0], min=1.0)
-
-        gauss_2 = lmfit.models.GaussianModel(prefix='g2_')
-        params.update(gauss_2.make_params())
-        params['g2_center'].set(value=p0[5], min=g_mu_min[index][1], max=g_mu_max[index][1])
-        params['g2_sigma'].set(value=p0[6], min=0.5, max=5.)
-        params['g2_amplitude'].set(value=p0[4], min=1.0)
-
-        gauss_3 = lmfit.models.GaussianModel(prefix='g3_')
-        params.update(gauss_3.make_params())
-        params['g3_center'].set(value=p0[9], min=g_mu_min[index][2], max=g_mu_max[index][2])
-        params['g3_sigma'].set(value=p0[10], min=0.5, max=5.)
-        params['g3_amplitude'].set(value=p0[8], min=1.0)        
-
-        mod = gauss_1 + gauss_2 + gauss_3 + exp_mod + line_mod
-        init = mod.eval(params, x=g_bin_centers)
-        out = mod.fit(g_tof_hist, params, x=g_bin_centers)
-
+        res = gmodel.fit(g_tof_hist, params, x=g_bin_centers, nan_policy='omit')
         print '\nFitting gamma peaks with LMFIT'
-        print out.message
-        print lmfit.fit_report(out,show_correl=True)
+        print res.message
+        print lmfit.fit_report(res,show_correl=True)
 
-        plt.plot(g_bin_centers, g_tof_hist)
-        plt.plot(g_bin_centers, out.init_fit)
-        plt.plot(g_bin_centers, out.best_fit)
-        plt.show()
-
-        #gmodel = lmfit.Model(triple_gaus_exp_convo)
-        #gmodel.set_param_hint('mu_1',value=p0[1], min=g_mu_min[index][0], max=g_mu_max[index][0])
-        #gmodel.set_param_hint('mu_2', value=p0[5], min=g_mu_min[index][1], max=g_mu_max[index][1])
-        #gmodel.set_param_hint('mu_3', value=p0[9], min=g_mu_min[index][2], max=g_mu_max[index][2])
-        #gmodel.set_param_hint('sigma_1', value=p0[2], min=0.5, max=5.)
-        #gmodel.set_param_hint('sigma_2', value=p0[6], min=0.5, max=5.)
-        #gmodel.set_param_hint('sigma_3', value=p0[10], min=0.5, max=5.)
-        #gmodel.set_param_hint('a_1', value=p0[0], min=1.0)
-        #gmodel.set_param_hint('a_2', value=p0[0], min=1.0)
-        #gmodel.set_param_hint('a_3', value=p0[0], min=1.0)
-        #gmodel.set_param_hint('tau_1', value=p0[3], max=10.)
-        #params = gmodel.make_params(a_1=p0[0], mu_1=p0[1], sigma_1=p0[2], tau_1=p0[3], a_2=p0[4], mu_2=p0[5], sigma_2=p0[6], tau_2=p0[7],
-        #                            a_3=p0[8], mu_3=p0[9], sigma_3=p0[10], tau_3=p0[11], m=0.1, b=40.)
-#
-        #res = gmodel.fit(g_tof_hist, params, x=g_bin_centers, nan_policy='omit')
-    #    print '\nFitting gamma peaks with LMFIT'
-    #    print res.message
-    #    print lmfit.fit_report(res,show_correl=True)
-#
-    #    coeff = ( res.params['a_1'].value, res.params['mu_1'].value, res.params['sigma_1'].value,
-    #              res.params['a_2'].value, res.params['mu_2'].value, res.params['sigma_2'].value, 
-    #              res.params['a_3'].value, res.params['mu_3'].value, res.params['sigma_3'].value )
-    #    g_hist_fit = triple_gaus_exp_convo( g_bin_centers, res.params['a_1'].value, res.params['mu_1'].value, res.params['sigma_1'].value, res.params['tau_1'].value,
-    #                                        res.params['a_2'].value, res.params['mu_2'].value, res.params['sigma_2'].value, res.params['tau_2'].value,
-    #                                        res.params['a_3'].value, res.params['mu_3'].value, res.params['sigma_3'].value, res.params['tau_3'].value, 
-    #                                        res.params['m'].value, res.params['b'].value )
-    #    g_full_hist_fit = triple_gaus_exp_convo( bin_centers, res.params['a_1'].value, res.params['mu_1'].value, res.params['sigma_1'].value, res.params['tau_1'].value,
-    #                                             res.params['a_2'].value, res.params['mu_2'].value, res.params['sigma_2'].value, res.params['tau_2'].value,
-    #                                             res.params['a_3'].value, res.params['mu_3'].value, res.params['sigma_3'].value, res.params['tau_3'].value,
-    #                                             res.params['m'].value, res.params['b'].value )
-    #means_stds.append((coeff[1],coeff[2],coeff[4],coeff[5],coeff[7],coeff[8]))
+        coeff = ( res.params['a_1'].value, res.params['mu_1'].value, res.params['sigma_1'].value,
+                  res.params['a_2'].value, res.params['mu_2'].value, res.params['sigma_2'].value, 
+                  res.params['a_3'].value, res.params['mu_3'].value, res.params['sigma_3'].value )
+        g_hist_fit = triple_gaus_exp_convo( g_bin_centers, res.params['a_1'].value, res.params['mu_1'].value, res.params['sigma_1'].value, res.params['tau_1'].value,
+                                            res.params['a_2'].value, res.params['mu_2'].value, res.params['sigma_2'].value, res.params['tau_2'].value,
+                                            res.params['a_3'].value, res.params['mu_3'].value, res.params['sigma_3'].value, res.params['tau_3'].value, 
+                                            res.params['m'].value, res.params['b'].value )
+        g_full_hist_fit = triple_gaus_exp_convo( bin_centers, res.params['a_1'].value, res.params['mu_1'].value, res.params['sigma_1'].value, res.params['tau_1'].value,
+                                                 res.params['a_2'].value, res.params['mu_2'].value, res.params['sigma_2'].value, res.params['tau_2'].value,
+                                                 res.params['a_3'].value, res.params['mu_3'].value, res.params['sigma_3'].value, res.params['tau_3'].value,
+                                                 res.params['m'].value, res.params['b'].value )
+    means_stds.append((coeff[1],coeff[2],coeff[4],coeff[5],coeff[7],coeff[8]))
     
-   # # gamma plot
-   # fig1, ax1 = plt.subplots()
-   # plt.plot(g_bin_centers, g_tof_hist)
-   # plt.plot(g_bin_centers, g_hist_fit) 
-   # plt.ylabel('counts')
-   # plt.xlabel('time (ns)')
-   # plt.text(0.7,0.7,'$\mu_1 = $'+str(round(means_stds[1+2*index][0],3))+'\n$\sigma_1 =$ '+str(round(means_stds[1+2*index][1],3))+'\n$\mu_2 =$ '+
-   #          str(round(means_stds[1+2*index][2],3))+'\n$\sigma_2 =$ '+str(round(means_stds[1+2*index][3],3))+'\n$\mu_3 =$ '+
-   #          str(round(means_stds[1+2*index][4],3))+'\n$\sigma_3 =$ '+str(round(means_stds[1+2*index][5],3)),transform=ax1.transAxes)
-   # if plt_save == True:
-   #     plt.savefig(save_dir+fit_type+'_'+dist+'cm_g_fit.png',dpi=500)
-#
-   # # neutron plot    
-   # fig2, ax2 = plt.subplots()
-   # plt.plot(n_bin_centers, n_tof_hist)
-   # plt.plot(n_bin_centers, n_hist_fit, label='convo')
-   # plt.ylabel('counts')
-   # plt.xlabel('time (ns)')
-   # plt.text(0.7,0.7,'$\mu =$ '+str(round(means_stds[0+2*index][0],3))+'\n$\sigma =$ '+str(round(means_stds[0+2*index][1],3)), transform=ax2.transAxes)
-   # if plt_save == True:    
-   #     plt.savefig(save_dir+fit_type+'_'+dist+'cm_n_fit.png',dpi=500)
-#
-   # # full
-   # plt.figure()
-   # # scale
-   # n_full_hist_fit = [n*max(tof_hist)/max(n_full_hist_fit) for n in n_full_hist_fit]
-   # g_full_hist_fit = [g*max(tof_hist[len(tof_hist)*3./5.:])/max(g_full_hist_fit) for g in g_full_hist_fit]
-   # plt.plot(bin_centers,tof_hist)
-   # plt.plot(bin_centers, n_full_hist_fit, linewidth=2, linestyle='--')
-   # plt.plot(bin_centers, g_full_hist_fit, linewidth=2, linestyle='--')
-   # plt.ylabel('counts')
-   # plt.xlabel('time (ns)')
-   # if plt_save == True:
-   #     plt.savefig(save_dir+fit_type+'_'+dist+'cm_tof_fits.png',dpi=500)
+    # gamma plot
+    fig1, ax1 = plt.subplots()
+    plt.plot(g_bin_centers, g_tof_hist)
+    plt.plot(g_bin_centers, g_hist_fit) 
+    plt.ylabel('counts')
+    plt.xlabel('time (ns)')
+    plt.text(0.7,0.7,'$\mu_1 = $'+str(round(means_stds[1+2*index][0],3))+'\n$\sigma_1 =$ '+str(round(means_stds[1+2*index][1],3))+'\n$\mu_2 =$ '+
+             str(round(means_stds[1+2*index][2],3))+'\n$\sigma_2 =$ '+str(round(means_stds[1+2*index][3],3))+'\n$\mu_3 =$ '+
+             str(round(means_stds[1+2*index][4],3))+'\n$\sigma_3 =$ '+str(round(means_stds[1+2*index][5],3)),transform=ax1.transAxes)
+    if plt_save == True:
+        plt.savefig(save_dir+fit_type+'_'+dist+'cm_g_fit.png',dpi=500)
+
+    # neutron plot    
+    fig2, ax2 = plt.subplots()
+    plt.plot(n_bin_centers, n_tof_hist)
+    plt.plot(n_bin_centers, n_hist_fit, label='convo')
+    plt.ylabel('counts')
+    plt.xlabel('time (ns)')
+    plt.text(0.7,0.7,'$\mu =$ '+str(round(means_stds[0+2*index][0],3))+'\n$\sigma =$ '+str(round(means_stds[0+2*index][1],3)), transform=ax2.transAxes)
+    if plt_save == True:    
+        plt.savefig(save_dir+fit_type+'_'+dist+'cm_n_fit.png',dpi=500)
+
+    # full
+    plt.figure()
+    # scale
+    n_full_hist_fit = [n*max(tof_hist)/max(n_full_hist_fit) for n in n_full_hist_fit]
+    g_full_hist_fit = [g*max(tof_hist[len(tof_hist)*3./5.:])/max(g_full_hist_fit) for g in g_full_hist_fit]
+    plt.plot(bin_centers,tof_hist)
+    plt.plot(bin_centers, n_full_hist_fit, linewidth=2, linestyle='--')
+    plt.plot(bin_centers, g_full_hist_fit, linewidth=2, linestyle='--')
+    plt.ylabel('counts')
+    plt.xlabel('time (ns)')
+    if plt_save == True:
+        plt.savefig(save_dir+fit_type+'_'+dist+'cm_tof_fits.png',dpi=500)
 
 plt.show()
 if save_params == True:
