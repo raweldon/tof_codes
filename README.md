@@ -17,7 +17,7 @@ guassian and guass_exp_conv both look good
 update tof_energy_calc.py to account for gamma populations from havar and dcell stop 
 
 8/6/18  
-Working on 4 MeV branch
-updated gamma fit to triple guassian with line for background -- looks good
-REMEBER --> plot lmfit results with res.best_fit, intial with res.initial_fit 
+Working on 4 MeV branch   
+updated gamma fit to triple guassian with line for background -- looks good   
+REMEBER --> plot lmfit results with res.best_fit, intial with res.initial_fit    
    
