@@ -8,8 +8,8 @@ for dist in dists:
     tof_spec = np.load('dist_'+dist+'.npz')
     tof = tof_spec['data']
     tof = [x*4 for x in tof] # 1 clock cycle = 4 ns (250 MHz digitizer)
-    tof = [i for i in tof if i<500 and i>200]
+    tof = [i for i in tof if i<500 and i>150]
 
     plt.figure()
-    plt.hist(tof,bins=1e4,histtype='step')
+    plt.hist(tof,bins=2e3,histtype='step')
     plt.show()
