@@ -28,9 +28,9 @@ went back to lmfit - got gaussian model to work fairly well
 
 8/13/18  
 Next steps:
--- gauss_exp_conv for gamma peaks
--- better fit for 4 MeV neutron peaks
--- error function for background of 11 MeV code
--- update 11 MeV code to use lmfit
--- find better functional fit for 11 MeV peak???
+-- gauss_exp_conv for gamma peaks  
+-- better fit for 4 MeV neutron peaks  
+-- error function for background of 11 MeV code  
+-- update 11 MeV code to use lmfit  
+-- find better functional fit for 11 MeV peak???  
    
