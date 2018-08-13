@@ -20,4 +20,17 @@ update tof_energy_calc.py to account for gamma populations from havar and dcell 
 Working on 4 MeV branch   
 updated gamma fit to triple guassian with line for background -- looks good   
 REMEBER --> plot lmfit results with res.best_fit, intial with res.initial_fit    
+
+8/9/18  
+Working with multi neutron peaks    
+tried using scipy optimize - not better than lmfit (still needed bounds)  
+went back to lmfit - got gaussian model to work fairly well  
+
+8/13/18  
+Next steps:
+-- gauss_exp_conv for gamma peaks
+-- better fit for 4 MeV neutron peaks
+-- error function for background of 11 MeV code
+-- update 11 MeV code to use lmfit
+-- find better functional fit for 11 MeV peak???
    
