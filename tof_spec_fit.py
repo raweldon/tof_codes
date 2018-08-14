@@ -40,9 +40,9 @@ def print_stats():
             )+" ns"+'\n  mu2 = '+str(coeff[4])+'\n  sigma2 = '+str(coeff[5])    
 
 save_dir = 'C:/Users/raweldon/Research/TUNL/git_programs/tof_codes/plots/'
-gauss = True # true if guass fit, flase if guass-exp convolution fit
+gauss = False # true if guass fit, flase if guass-exp convolution fit
 plt_save = False # if true save plots
-save_params = False # if true save params to pickle
+save_params = True # if true save params to pickle
 
 # 11 MeV
 dists = ['180', '256', '363']
@@ -52,7 +52,7 @@ dists = ['180', '256', '363']
 # get vaules by inspection with plot_tof_hist.py
 # 11.325 MeV
 # gauss ranges
-if gauss == True:
+if gauss:
     fit_type = 'gauss'
     # values fit top of neutron spectrum
 #    n_ranges=[[338.5,341.5],[322.,325.],[298.5,301.5]]
@@ -108,6 +108,7 @@ for index,dist in enumerate(dists):
         coeff = (res.params['a'].value, res.params['mu'].value, res.params['sigma'].value)
         n_hist_fit = gaussian(n_bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value)
         n_full_hist_fit = gaussian(bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value)
+        means_stds.append((coeff[1],coeff[2]))
 
     else:
         gmodel = lmfit.Model(gaus_exp_convo)
@@ -118,14 +119,12 @@ for index,dist in enumerate(dists):
         print res.message
         print lmfit.fit_report(res,show_correl=True)
 
-        coeff = (res.params['a'].value, res.params['mu'].value, res.params['sigma'].value)#, res.params['tau'].value)
-        n_hist_fit = gaussian(n_bin_centers, *coeff)
-        n_full_hist_fit = gaussian(bin_centers, *coeff)
         coeff = (res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
         n_hist_fit = gaus_exp_convo(n_bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
         n_full_hist_fit = gaus_exp_convo(bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
+        means_stds.append((coeff[1]+coeff[3],coeff[2]))
 
-    means_stds.append((coeff[1],coeff[2]))
+    
     print "\nneutron gaussian fit:\n  mu = "+str(coeff[1])+" ns\n  sigma = "+str(coeff[2])
 
     # gammas
@@ -144,7 +143,7 @@ for index,dist in enumerate(dists):
     plt.xlabel('time (ns)')
     plt.text(0.7,0.75,'$\mu_1 = $'+str(round(means_stds[1+2*index][0],3))+'\n$\sigma_1 =$ '+str(round(means_stds[1+2*index][1],3))+'\n$\mu_2 =$ '+
              str(round(means_stds[1+2*index][2],3))+'\n$\sigma_2 =$ '+str(round(means_stds[1+2*index][3],3)), transform=ax1.transAxes)
-    if plt_save == True:
+    if plt_save:
         plt.savefig(save_dir+fit_type+'_'+dist+'cm_g_fit.png',dpi=500)
 
     # neutron plot    
@@ -154,7 +153,7 @@ for index,dist in enumerate(dists):
     plt.ylabel('counts')
     plt.xlabel('time (ns)')
     plt.text(0.7,0.75,'$\mu =$ '+str(round(means_stds[0+2*index][0],3))+'\n$\sigma =$ '+str(round(means_stds[0+2*index][1],3)), transform=ax2.transAxes)
-    if plt_save == True:    
+    if plt_save:    
         plt.savefig(save_dir+fit_type+'_'+dist+'cm_n_fit.png',dpi=500)
 
     # full
@@ -167,10 +166,10 @@ for index,dist in enumerate(dists):
     plt.plot(bin_centers, g_full_hist_fit, linewidth=2, linestyle='--')
     plt.ylabel('counts')
     plt.xlabel('time (ns)')
-    if plt_save == True:
+    if plt_save:
         plt.savefig(save_dir+fit_type+'_'+dist+'cm_tof_fits.png',dpi=500)
 
 plt.show()
-if save_params == True:
+if save_params:
     pickle.dump( means_stds, open( "peak_fit_params_11mev_"+fit_type+".p", "wb" ) )
     print '\nparams saved to peak_fit_params_11mev_'+fit_type+'.p'
