@@ -33,4 +33,9 @@ Next steps:
 -- error function for background of 11 MeV code  
 -- update 11 MeV code to use lmfit  
 -- find better functional fit for 11 MeV peak???  
+
+8/15/2018  
+Abandoned multi peak fits -- didn't really work  
+Obtained neutron max peak location by eye, fits for gamma peaks
+Results look great
    
