@@ -42,7 +42,7 @@ def print_stats():
 save_dir = 'C:/Users/raweldon/Research/TUNL/git_programs/tof_codes/plots/'
 gauss = False # true if guass fit, flase if guass-exp convolution fit
 plt_save = False # if true save plots
-save_params = True # if true save params to pickle
+save_params = False # if true save params to pickle
 
 # 11 MeV
 dists = ['180', '256', '363']
@@ -122,7 +122,7 @@ for index,dist in enumerate(dists):
         coeff = (res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
         n_hist_fit = gaus_exp_convo(n_bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
         n_full_hist_fit = gaus_exp_convo(bin_centers, res.params['a'].value, res.params['mu'].value, res.params['sigma'].value, res.params['tau'].value)
-        means_stds.append((coeff[1]+coeff[3],coeff[2]))
+        means_stds.append((coeff[1]+coeff[3],coeff[2])) # gauss_exp_conv mean is mu + tau
 
     
     print "\nneutron gaussian fit:\n  mu = "+str(coeff[1])+" ns\n  sigma = "+str(coeff[2])

@@ -30,5 +30,14 @@ Next steps:
 -- better fit for 4 MeV neutron peaks  
 -- error function for background of 11 MeV code  
 -- update 11 MeV code to use lmfit  
--- find better functional fit for 11 MeV peak???  
+-- find better functional fit for 11 MeV peak???    
+
+8/14/18
+Updated tof_energy_calc.py  
+Off by ~2ns -- Why???  
+
+8/15/2018  
+Updated tof_energy_calc.py -- at ~11.1 MeV
+Still low but with in uncert
+Oct data is also low
    
