@@ -72,20 +72,12 @@ det_traverse = 5.08/rel_vel(E_n,mn)
 del_tof_rel = [np.sqrt(det_traverse**2 + b**2) for b in bunch_width]
 del_tof_nonrel = [np.sqrt((5.08/nonrel_vel(E_n,mn))**2 + b**2) for b in bunch_width]
 
-havar_peak = True
+dist_to_dcell = [dcel_to_beamend + dcel_length/2. + det_size/2. + d for d in dist] # for havar gamma start
+#     gamma peak            gamma travel time from havar to detection      n peak  deuteron travel time to center of havar
+tof_rel = [tof_g1[i] + (dist_to_dcell[i] + dcel_length/2.)/c - n - dcel_length/2./rel_vel(E_d_14,md) for i,n in enumerate(tof_n)] # havar gamma start
+tof_nonrel = [tof_g1[i] + (dist_to_dcell[i] + dcel_length/2.)/c - n - dcel_length/2./nonrel_vel(E_d_14,md) for i,n in enumerate(tof_n)]
 
-if havar_peak:
-    dist_to_dcell = [dcel_to_beamend + dcel_length/2. + det_size/2. + d for d in dist] # for havar gamma start
-    #     gamma peak            gamma travel time from havar to detection      n peak  deuteron travel time to center of havar
-    tof_rel = [tof_g1[i] + (dist_to_dcell[i] + dcel_length/2.)/c - n - dcel_length/2./rel_vel(E_d_14,md) for i,n in enumerate(tof_n)] # havar gamma start
-    tof_nonrel = [tof_g1[i] + (dist_to_dcell[i] + dcel_length/2.)/c - n - dcel_length/2./nonrel_vel(E_d_14,md) for i,n in enumerate(tof_n)]
-
-else:
-    dist_to_dcell = [dcel_to_beamend + det_size/2. + d for d in dist] # for dcell stop gamma start
-    #     gamma peak   gamma travel time from dcell stop to det    n peak  n travel time from dcell center to stop
-    tof_rel = [tof_g2[i]+(dist_to_dcell[i])/c + dcel_length/2.*rel_vel(E_d_34,md) - n     for i,n in enumerate(tof_n)] # dcell stop gamma start
-    tof_nonrel = [tof_g2[i]+(dist_to_dcell[i])/c + dcel_length/2.*nonrel_vel(E_d_34,md) - n     for i,n in enumerate(tof_n)]
-
+print '\nNeutron Energy = ', E_n, '\n'
 dists = ['179 cm', '276 cm', '369 cm']
 for i,t in enumerate(tof_rel):
     print '--------------------------------------'
