@@ -54,7 +54,7 @@ def build_hist(vals, bin_no):
 
 save_dir = 'C:/Users/raweldon/Research/TUNL/git_programs/tof_codes/plots/'
 gauss = False # true if guass fit, flase if guass-exp convolution fit
-plt_save = False # if true save plots
+plt_save = True # if true save plots
 save_params = False # if true save params to pickle
 
 dists = ['179','276','369']
@@ -90,7 +90,7 @@ for index,dist in enumerate(dists):
     g_tof = get_range(tof, g_ranges[index][0], g_ranges[index][1])
     
     # build hists  
-    tof_hist, bin_centers = build_hist(tof, 1e3)
+    tof_hist, bin_centers = build_hist(tof, 1000)
     n_tof_hist, n_bin_centers = build_hist(n_tof, 1000)
     g_tof_hist, g_bin_centers = build_hist(g_tof, 1000)
     
@@ -156,36 +156,49 @@ for index,dist in enumerate(dists):
     fig1, ax1 = plt.subplots()
     plt.plot(g_bin_centers, g_tof_hist)
     plt.plot(g_bin_centers, g_hist_fit) 
-    plt.ylabel('counts')
-    plt.xlabel('time (ns)')
+    plt.ylabel('Counts', fontsize=18)
+    plt.xlabel('Time (ns)', fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.xlim(375, 430)
+    plt.tight_layout()
     plt.text(0.7,0.7,'$\mu_1 = $'+str(round(means_stds[1+2*index][0],3))+'\n$\sigma_1 =$ '+str(round(means_stds[1+2*index][1],3))+'\n$\mu_2 =$ '+
              str(round(means_stds[1+2*index][2],3))+'\n$\sigma_2 =$ '+str(round(means_stds[1+2*index][3],3))+'\n$\mu_3 =$ '+
              str(round(means_stds[1+2*index][4],3))+'\n$\sigma_3 =$ '+str(round(means_stds[1+2*index][5],3)),transform=ax1.transAxes)
     if plt_save == True:
-        plt.savefig(save_dir+fit_type+'_'+dist+'cm_g_fit.png',dpi=500)
+        plt.savefig(save_dir+fit_type+'_'+dist+'cm_g_fit.pdf')
+        #plt.savefig(save_dir+fit_type+'_'+dist+'cm_g_fit.png',dpi=500)
 
     # neutron plot    
     fig2, ax2 = plt.subplots()
     plt.plot(n_bin_centers, n_tof_hist)
     plt.plot(n_bin_centers, n_hist_fit, label='convo')
-    plt.ylabel('counts')
-    plt.xlabel('time (ns)')
+    plt.ylabel('Counts', fontsize=18)
+    plt.xlabel('Time (ns)', fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.tight_layout()
     plt.text(0.7,0.7,'$\mu =$ '+str(round(means_stds[0+2*index][0],3))+'\n$\sigma =$ '+str(round(means_stds[0+2*index][1],3)), transform=ax2.transAxes)
     if plt_save == True:    
-        plt.savefig(save_dir+fit_type+'_'+dist+'cm_n_fit.png',dpi=500)
+        plt.savefig(save_dir + fit_type + '_' + dist + 'cm_n_fit.pdf')
+        #plt.savefig(save_dir + fit_type + '_' + dist + 'cm_n_fit.png',dpi=500)
 
     # full
     plt.figure()
     # scale
     n_full_hist_fit = [n*max(tof_hist)/max(n_full_hist_fit) for n in n_full_hist_fit]
-    g_full_hist_fit = [g*max(tof_hist[len(tof_hist)*3./5.:])/max(g_full_hist_fit) for g in g_full_hist_fit]
+    g_full_hist_fit = [g*max(tof_hist[len(tof_hist)*3/5:])/max(g_full_hist_fit) for g in g_full_hist_fit]
     plt.plot(bin_centers,tof_hist)
-    plt.plot(bin_centers, n_full_hist_fit, linewidth=2, linestyle='--')
-    plt.plot(bin_centers, g_full_hist_fit, linewidth=2, linestyle='--')
-    plt.ylabel('counts')
-    plt.xlabel('time (ns)')
+    #plt.plot(bin_centers, n_full_hist_fit, linewidth=2, linestyle='--')
+    #plt.plot(bin_centers, g_full_hist_fit, linewidth=2, linestyle='--')
+    plt.ylabel('Counts', fontsize=18)
+    plt.xlabel('Time (ns)', fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.tight_layout()
     if plt_save == True:
-        plt.savefig(save_dir+fit_type+'_'+dist+'cm_tof_fits.png',dpi=500)
+        plt.savefig(save_dir+fit_type+'_'+dist+'cm_tof_fits.pdf')
+        #plt.savefig(save_dir+fit_type+'_'+dist+'cm_tof_fits.png',dpi=500)
 
 plt.show()
 if save_params == True:

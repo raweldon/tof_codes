@@ -48,7 +48,8 @@ def nonrel_vel(T,m):
 def rel_vel(T,m):
     return c*np.sqrt(1. - (1./(1.+T/m))**2) #cm/ns
 
-tof_n = [301.6, 271.0, 240.8]
+tof_n = [304.0, 272.4, 240.3]
+#tof_n = [303.2, 271.3, 240.6] # desired values
 tof_g1 = [401.6, 398.4, 395.4]  # only havar peak for 4.8 MeV neutrons
 sigma_g1 = [0.634, 0.725, 0.817]
 

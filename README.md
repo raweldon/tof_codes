@@ -2,6 +2,7 @@
 tof codes for oct 2017 and feb 2018 runs
 
 ## scripts
+multi_exp_gauss_fit.py - used to calculate neutron peak time
 tof_spec_fit.py - fits gaussians to neutron and gamma peaks   
 tof_energy_calc.py - calculates energy and timing information
 

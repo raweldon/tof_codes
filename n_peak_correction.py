@@ -59,37 +59,69 @@ def gaus_exp_convo(x, a, mu, sigma, gamma, m, b):
     line = m*x + b
     return func + line
 
-def gaus_exp_6(x, a1, mu1, sigma1, gamma1, a2, mu2, sigma2, gamma2, a3, mu3, sigma3, gamma3, 
-               a4, mu4, sigma4, gamma4, a5, mu5, sigma5, gamma5, a6, mu6, sigma6, gamma6, m, b ):
+# def gaus_exp_6(x, a1, mu1, sigma1, gamma1, a2, mu2, sigma2, gamma2, a3, mu3, sigma3, gamma3, 
+#                a4, mu4, sigma4, gamma4, a5, mu5, sigma5, gamma5, a6, mu6, sigma6, gamma6, m, b ):
+#     a = [a1,a2,a3,a4,a5,a6]
+#     mu = [mu1,mu2,mu3,mu4,mu5,mu6]
+#     sigma = [sigma1,sigma2,sigma3,sigma4,sigma5,sigma6]
+#     gamma = [gamma1,gamma2,gamma3,gamma4,gamma5,gamma6]
+#     func = sum([a[i]*(gamma[i]/2.) * np.exp(-gamma[i]*(mu[i]-x+0.5*gamma[i]*sigma[i]*sigma[i])) * 
+#             (1 - erf(-(mu[i]+gamma[i]*sigma[i]*sigma[i]-x)/(sigma[i]*np.sqrt(2.)))) for i in xrange(len(a))])
+#     line = m*x + b
+#     return func + line
+
+# def gaus_exp_7(x, a1, mu1, sigma1, gamma1, a2, mu2, sigma2, gamma2, a3, mu3, sigma3, gamma3, 
+#                a4, mu4, sigma4, gamma4, a5, mu5, sigma5, gamma5, a6, mu6, sigma6, gamma6, a7, mu7, sigma7, gamma7, m, b ):
+#     a = [a1,a2,a3,a4,a5,a6,a7]
+#     mu = [mu1,mu2,mu3,mu4,mu5,mu6,mu7]
+#     sigma = [sigma1,sigma2,sigma3,sigma4,sigma5,sigma6,sigma7]
+#     gamma = [gamma1,gamma2,gamma3,gamma4,gamma5,gamma6,gamma7]
+#     func = sum([a[i]*(gamma[i]/2.) * np.exp(-gamma[i]*(mu[i]-x+0.5*gamma[i]*sigma[i]*sigma[i])) * 
+#             erfc((mu[i]+gamma[i]*sigma[i]*sigma[i]-x)/(sigma[i]*np.sqrt(2.))) for i in xrange(len(a))])
+#     line = m*x + b
+#     return func + line
+
+# def gaus_exp_8(x, a1, mu1, sigma1, gamma1, a2, mu2, sigma2, gamma2, a3, mu3, sigma3, gamma3, 
+#                a4, mu4, sigma4, gamma4, a5, mu5, sigma5, gamma5, a6, mu6, sigma6, gamma6, 
+#                a7, mu7, sigma7, gamma7, a8, mu8, sigma8, gamma8, m, b ):
+#     a = [a1,a2,a3,a4,a5,a6,a7,a8]
+#     mu = [mu1,mu2,mu3,mu4,mu5,mu6,mu7,mu8]
+#     sigma = [sigma1,sigma2,sigma3,sigma4,sigma5,sigma6,sigma7,sigma8]
+#     gamma = [gamma1,gamma2,gamma3,gamma4,gamma5,gamma6,gamma7,gamma8]
+#     func = sum([a[i]*(gamma[i]/2.) * np.exp(-gamma[i]*(mu[i]-x+0.5*gamma[i]*sigma[i]*sigma[i])) * 
+#             erfc((mu[i]+gamma[i]*sigma[i]*sigma[i]-x)/(sigma[i]*np.sqrt(2.))) for i in xrange(len(a))])
+#     line = m*x + b
+#     return func + line
+
+# single gamma terms
+def gaus_exp_6(x, a1, mu1, sigma1, gamma, a2, mu2, sigma2, a3, mu3, sigma3, 
+               a4, mu4, sigma4, a5, mu5, sigma5, a6, mu6, sigma6, m, b ):
     a = [a1,a2,a3,a4,a5,a6]
     mu = [mu1,mu2,mu3,mu4,mu5,mu6]
     sigma = [sigma1,sigma2,sigma3,sigma4,sigma5,sigma6]
-    gamma = [gamma1,gamma2,gamma3,gamma4,gamma5,gamma6]
-    func = sum([a[i]*(gamma[i]/2.) * np.exp(-gamma[i]*(mu[i]-x+0.5*gamma[i]*sigma[i]*sigma[i])) * 
-            (1 - erf(-(mu[i]+gamma[i]*sigma[i]*sigma[i]-x)/(sigma[i]*np.sqrt(2.)))) for i in xrange(len(a))])
+    func = sum([a[i]*(gamma/2.) * np.exp(-gamma*(mu[i]-x+0.5*gamma*sigma[i]*sigma[i])) * 
+            (1 - erf(-(mu[i]+sigma[i]*sigma[i]-x)/(sigma[i]*np.sqrt(2.)))) for i in xrange(len(a))])
     line = m*x + b
     return func + line
 
-def gaus_exp_7(x, a1, mu1, sigma1, gamma1, a2, mu2, sigma2, gamma2, a3, mu3, sigma3, gamma3, 
-               a4, mu4, sigma4, gamma4, a5, mu5, sigma5, gamma5, a6, mu6, sigma6, gamma6, a7, mu7, sigma7, gamma7, m, b ):
+def gaus_exp_7(x, a1, mu1, sigma1, gamma, a2, mu2, sigma2, a3, mu3, sigma3,  
+               a4, mu4, sigma4, a5, mu5, sigma5, a6, mu6, sigma6, a7, mu7, sigma7, m, b ):
     a = [a1,a2,a3,a4,a5,a6,a7]
     mu = [mu1,mu2,mu3,mu4,mu5,mu6,mu7]
     sigma = [sigma1,sigma2,sigma3,sigma4,sigma5,sigma6,sigma7]
-    gamma = [gamma1,gamma2,gamma3,gamma4,gamma5,gamma6,gamma7]
-    func = sum([a[i]*(gamma[i]/2.) * np.exp(-gamma[i]*(mu[i]-x+0.5*gamma[i]*sigma[i]*sigma[i])) * 
-            erfc((mu[i]+gamma[i]*sigma[i]*sigma[i]-x)/(sigma[i]*np.sqrt(2.))) for i in xrange(len(a))])
+    func = sum([a[i]*(gamma/2.) * np.exp(-gamma*(mu[i]-x+0.5*gamma*sigma[i]*sigma[i])) * 
+            erfc((mu[i]+gamma*sigma[i]*sigma[i]-x)/(sigma[i]*np.sqrt(2.))) for i in xrange(len(a))])
     line = m*x + b
     return func + line
 
-def gaus_exp_8(x, a1, mu1, sigma1, gamma1, a2, mu2, sigma2, gamma2, a3, mu3, sigma3, gamma3, 
-               a4, mu4, sigma4, gamma4, a5, mu5, sigma5, gamma5, a6, mu6, sigma6, gamma6, 
-               a7, mu7, sigma7, gamma7, a8, mu8, sigma8, gamma8, m, b ):
+def gaus_exp_8(x, a1, mu1, sigma1, gamma, a2, mu2, sigma2, a3, mu3, sigma3, 
+               a4, mu4, sigma4, a5, mu5, sigma5,a6, mu6, sigma6, 
+               a7, mu7, sigma7, a8, mu8, sigma8, m, b ):
     a = [a1,a2,a3,a4,a5,a6,a7,a8]
     mu = [mu1,mu2,mu3,mu4,mu5,mu6,mu7,mu8]
     sigma = [sigma1,sigma2,sigma3,sigma4,sigma5,sigma6,sigma7,sigma8]
-    gamma = [gamma1,gamma2,gamma3,gamma4,gamma5,gamma6,gamma7,gamma8]
-    func = sum([a[i]*(gamma[i]/2.) * np.exp(-gamma[i]*(mu[i]-x+0.5*gamma[i]*sigma[i]*sigma[i])) * 
-            erfc((mu[i]+gamma[i]*sigma[i]*sigma[i]-x)/(sigma[i]*np.sqrt(2.))) for i in xrange(len(a))])
+    func = sum([a[i]*(gamma/2.) * np.exp(-gamma*(mu[i]-x+0.5*gamma*sigma[i]*sigma[i])) * 
+            erfc((mu[i]+gamma*sigma[i]*sigma[i]-x)/(sigma[i]*np.sqrt(2.))) for i in xrange(len(a))])
     line = m*x + b
     return func + line
 
@@ -107,64 +139,104 @@ gauss = False # true if guass fit, flase if guass-exp convolution fit
 plt_save = False # if true save plots
 save_params = False # if true save params to pickle
 
-#dists = ['179','276','369']
-dists = ['179']
+dists = ['179','276','369']
+#dists = ['179', '276']
 
  # get vaules by inspection with plot_tof_hist.py
 if gauss == True:
     fit_type='gauss'
-    model = (gaus_6,gaus_7,gaus_8)
-    peaks = (6,7,8)
+    model = (gaus_6, gaus_7, gaus_8)
+    peaks = (6, 7, 8)
     n_ranges=[[255.,380.],[205,380.],[160,380.]]
 else:
     fit_type = 'gauss_exp_conv'
-    model = (gaus_exp_6,gaus_exp_7,gaus_exp_8)
-    peaks = (6,7,8)
-    n_ranges=[[255.,380.],[205,380.],[160,380.]]
+    model = (gaus_exp_6, gaus_exp_6, gaus_exp_6)
+    peaks = (6, 6, 6)
+    n_ranges=[[260., 320.],[225., 300.],[160., 300.]]
      
-n_p0s = np.array([ [1.0, 287.0, 1.1, 0.31, 
-                    1.0, 291.0, 1.0, 0.31,
-                    1.0, 295.0, 1.0, 0.31,
-                    1.0, 299.0, 1.0, 0.31,
-                    1.0, 301.0, 1.0, 0.31,
-                    1.0 ,303.0 ,1.0, 0.31, -0.1,100.],
-                   [1.0, 251.0, 1.0, 0.31,
-                    1.0, 255.0, 1.0, 0.31,
-                    1.0, 259.0, 1.0, 0.31,
-                    1.0, 263.0, 1.0, 0.31,
-                    1.0, 267.0, 1.0, 0.31,
-                    1.0, 269.0, 1.0, 0.31,
-                    1.0, 271.0, 1.0, 0.31, -0.1,100.], 
-                   [1.0, 218.0, 1.0, 0.31,
-                    1.0, 222.0, 1.0, 0.31,
-                    1.0, 226.0, 1.0, 0.31,
-                    1.0, 230.0, 1.0, 0.31,
-                    1.0, 234.0, 1.0, 0.31,
-                    1.0, 238.0, 1.0, 0.31,
-                    1.0, 241.0, 1.0, 0.31,
-                    1.0, 242.0, 1.0, 0.31, -0.1,100.] ], dtype=np.object)
+# n_p0s = np.array([ [1000.0, 287.0, 1.1, 0.31, 
+#                     1000.0, 291.0, 1.0, 0.31,
+#                     1000.0, 295.0, 1.0, 0.31,
+#                     1000.0, 299.0, 1.0, 0.31,
+#                     1000.0, 301.0, 1.0, 0.31,
+#                     1000.0 ,303.0 ,1.0, 0.31, -0.1, 100.],
+#                    [1000.0, 251.0, 1.0, 0.31,
+#                     1000.0, 255.0, 1.0, 0.31,
+#                     1000.0, 259.0, 1.0, 0.31,
+#                     1000.0, 263.0, 1.0, 0.31,
+#                     1000.0, 267.0, 1.0, 0.31,
+#                     1000.0, 269.0, 1.0, 0.31,
+#                     1000.0, 271.0, 1.0, 0.31, -0.1, 100.], 
+#                    [1000.0, 218.0, 1.0, 0.31,
+#                     1000.0, 222.0, 1.0, 0.31,
+#                     1000.0, 226.0, 1.0, 0.31,
+#                     1000.0, 230.0, 1.0, 0.31,
+#                     1000.0, 234.0, 1.0, 0.31,
+#                     1000.0, 238.0, 1.0, 0.31,
+#                     1000.0, 241.0, 1.0, 0.31,
+#                     1000.0, 242.0, 1.0, 0.31, -0.1, 100.] ], dtype=np.object)
 
-n_bounds = [ [(0,200000), (284,286.5), (0.5,2), (0.3,0.5), 
-              (0,200000), (289,293), (0.5,2), (0.3,0.5),
-              (0,200000), (283,297), (0.5,2), (0.3,0.5),
-              (0,200000), (297,301), (0.5,2), (0.3,0.5),
-              (0,200000), (300,302), (0.5,2), (0.3,0.5),
-              (0,200000), (301,303), (0.5,2), (0.3,0.5), (-0.04,0.0),(-10,300)],
-             [(0,200000), (240,275), (0.5,2), (0.3,0.5),
-              (0,200000), (240,275), (0.5,2), (0.3,0.5),
-              (0,200000), (240,275), (0.5,2), (0.3,0.5),
-              (0,200000), (240,275), (0.5,2), (0.3,0.5),
-              (0,200000), (240,275), (0.5,2), (0.3,0.5),
-              (0,200000), (240,275), (0.5,2), (0.3,0.5), 
-              (0,200000), (240,275), (0.5,2), (0.3,0.5), (-0.04,0.0),(-10,200)],
-             [(0,200000), (200,250), (0.5,2), (0.3,0.5),
-              (0,200000), (200,250), (0.5,2), (0.3,0.5),
-              (0,200000), (200,250), (0.5,2), (0.3,0.5),
-              (0,200000), (200,250), (0.5,2), (0.3,0.5),
-              (0,200000), (200,250), (0.5,2), (0.3,0.5),
-              (0,200000), (200,250), (0.5,2), (0.3,0.5), 
-              (0,200000), (200,250), (0.5,2), (0.3,0.5),
-              (0,200000), (200,250), (0.5,2), (0.3,0.5), (-0.04,0.0),(-10,300)] ]
+# n_bounds = [ [(0, 200000), (284, 286.5), (0.5, 3), (0.3, 0.5), 
+#               (0, 200000), (289, 293), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (283, 297), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (297, 301), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (300, 302), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (301, 303), (0.5, 3), (0.3, 0.5), (-0.1, 0.0), (-10, 300)],
+#              [#(0, 200000), (245, 252), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (254, 257), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (257, 261), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (261, 264), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (264, 268), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (268, 271), (0.5, 3), (0.3, 0.5), 
+#               (0, 200000), (270, 275), (0.5, 3), (0.3, 0.5), (-0.1, 0.0), (-10, 200)],
+#              [(0, 200000), (200, 250), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (200, 250), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (200, 250), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (200, 250), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (200, 250), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (200, 250), (0.5, 3), (0.3, 0.5), 
+#               (0, 200000), (200, 250), (0.5, 3), (0.3, 0.5),
+#               (0, 200000), (200, 250), (0.5, 3), (0.3, 0.5), (-0.1, 0.0), (-10, 300)] ]
+
+
+
+n_p0s = np.array([ [1000.0, 285.0, 1.1, 0.31, 
+                    1000.0, 289.0, 1.0, 0.31,
+                    1000.0, 293.0, 1.0, 0.31,
+                    1000.0, 297.0, 1.0, 0.31,
+                    1000.0, 301.0, 1.0, 0.31,
+                    1000.0, 303.0 ,1.0, 0.31, -0.1, 100.],
+                   [1000.0, 254.0, 1.0, 0.31,
+                    1000.0, 258.0, 1.0, 0.31,
+                    1000.0, 262.0, 1.0, 0.31,
+                    1000.0, 266.0, 1.0, 0.31,
+                    1000.0, 270.0, 1.0, 0.31,
+                    1000.0, 272.0, 1.0, 0.31, -0.1, 100.], 
+                   [1000.0, 222.0, 1.0, 0.31,
+                    1000.0, 226.0, 1.0, 0.31,
+                    1000.0, 230.0, 1.0, 0.31,
+                    1000.0, 234.0, 1.0, 0.31,
+                    1000.0, 238.0, 1.0, 0.31,
+                    1000.0, 241.0, 1.0, 0.31, -0.1, 100.] ], dtype=np.object)
+
+n_bounds = [ [(0, 200000), (280, 290), (0.5, 3), (0.3, 0.5), 
+              (0, 200000), (284, 294), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (288, 298), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (292, 302), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (300, 304), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (302, 305), (0.5, 3), (0.3, 0.5), (-0.1, 0.0), (-10, 300)],
+             [(0, 200000), (252, 256), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (256, 260), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (260, 264), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (264, 268), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (268, 270), (0.5, 3), (0.3, 0.5), 
+              (0, 200000), (270, 275), (0.5, 3), (0.3, 0.5), (-0.1, 0.0), (-10, 200)],
+             [(0, 200000), (220, 224), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (224, 228), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (228, 232), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (232, 236), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (236, 238), (0.5, 3), (0.3, 0.5),
+              (0, 200000), (240, 245), (0.5, 3), (0.3, 0.5), (-0.1, 0.0), (-10, 300)] ]
 means_stds=[]
 
 for index,dist in enumerate(dists):
@@ -178,7 +250,7 @@ for index,dist in enumerate(dists):
     n_tof = get_range(tof, n_ranges[index][0], n_ranges[index][1])
     
     # build hists  
-    tof_hist, bin_centers = build_hist(tof, 2e3)
+    tof_hist, bin_centers = build_hist(tof, 2000)
     n_tof_hist, n_bin_centers = build_hist(n_tof, 1000)
     
     # neutrons
@@ -246,49 +318,44 @@ for index,dist in enumerate(dists):
         gmodel.set_param_hint('a1', value=p0[0], min=bounds[0][0], max=bounds[0][1])
         gmodel.set_param_hint('mu1', value=p0[1], min=bounds[1][0], max=bounds[1][1])
         gmodel.set_param_hint('sigma1', value=p0[2], min=bounds[2][0], max=bounds[2][1],    vary=True)
-        gmodel.set_param_hint('gamma1', value=p0[3], min=bounds[3][0], max=bounds[3][1],    vary=True)
+        gmodel.set_param_hint('gamma', value=p0[3], min=bounds[3][0], max=bounds[3][1],    vary=True)
         gmodel.set_param_hint('a2', value=p0[4], min=bounds[4][0], max=bounds[4][1])
         gmodel.set_param_hint('mu2', value=p0[5], min=bounds[5][0], max=bounds[5][1])
         gmodel.set_param_hint('sigma2', value=p0[6], min=bounds[6][0], max=bounds[6][1],    vary=True)
-        gmodel.set_param_hint('gamma2', value=p0[7], min=bounds[7][0], max=bounds[7][1],    vary=True)
         gmodel.set_param_hint('a3', value=p0[8], min=bounds[8][0], max=bounds[8][1])
         gmodel.set_param_hint('mu3', value=p0[9], min=bounds[9][0], max=bounds[9][1])
         gmodel.set_param_hint('sigma3', value=p0[10], min=bounds[10][0], max=bounds[10][1], vary=True)
-        gmodel.set_param_hint('gamma3', value=p0[11], min=bounds[11][0], max=bounds[11][1], vary=True)
         gmodel.set_param_hint('a4', value=p0[12], min=bounds[12][0], max=bounds[12][1])
         gmodel.set_param_hint('mu4', value=p0[13], min=bounds[13][0], max=bounds[13][1])
         gmodel.set_param_hint('sigma4', value=p0[14], min=bounds[14][0], max=bounds[14][1], vary=True)
-        gmodel.set_param_hint('gamma4', value=p0[15], min=bounds[15][0], max=bounds[15][1], vary=True)
         gmodel.set_param_hint('a5', value=p0[16], min=bounds[16][0], max=bounds[16][1])
         gmodel.set_param_hint('mu5', value=p0[17], min=bounds[17][0], max=bounds[17][1])
         gmodel.set_param_hint('sigma5', value=p0[18], min=bounds[18][0], max=bounds[18][1], vary=True)
-        gmodel.set_param_hint('gamma5', value=p0[19], min=bounds[19][0], max=bounds[19][1], vary=True)
         gmodel.set_param_hint('a6', value=p0[20], min=bounds[20][0], max=bounds[20][1])
         gmodel.set_param_hint('mu6', value=p0[21], min=bounds[21][0], max=bounds[21][1])
         gmodel.set_param_hint('sigma6', value=p0[22], min=bounds[22][0], max=bounds[22][1], vary=True)
-        gmodel.set_param_hint('gamma6', value=p0[23], min=bounds[23][0], max=bounds[23][1], vary=True)
 
-        if index == 0:
-            gmodel.set_param_hint('m', value=p0[24], min=bounds[24][0], max=bounds[24][1])
-            gmodel.set_param_hint('b', value=p0[25], min=bounds[25][0], max=bounds[25][1])
-        if index == 1:
-            gmodel.set_param_hint('a7', value=p0[24], min=bounds[24][0], max=bounds[24][1])
-            gmodel.set_param_hint('mu7', value=p0[25], min=bounds[25][0], max=bounds[25][1])
-            gmodel.set_param_hint('sigma7', value=p0[26], min=bounds[26][0], max=bounds[26][1])
-            gmodel.set_param_hint('gamma7', value=p0[27], min=bounds[27][0], max=bounds[27][1])
-            gmodel.set_param_hint('m', value=p0[28], min=bounds[28][0], max=bounds[28][1])
-            gmodel.set_param_hint('b', value=p0[29], min=bounds[29][0], max=bounds[29][1])
-        if index == 2:
-            gmodel.set_param_hint('a7', value=p0[24], min=bounds[24][0], max=bounds[24][1])
-            gmodel.set_param_hint('mu7', value=p0[25], min=bounds[25][0], max=bounds[25][1])
-            gmodel.set_param_hint('sigma7', value=p0[26], min=bounds[26][0], max=bounds[26][1])
-            gmodel.set_param_hint('gamma7', value=p0[27], min=bounds[27][0], max=bounds[27][1])
-            gmodel.set_param_hint('a8', value=p0[28], min=bounds[28][0], max=bounds[28][1])
-            gmodel.set_param_hint('mu8', value=p0[29], min=bounds[29][0], max=bounds[29][1])
-            gmodel.set_param_hint('sigma8', value=p0[30], min=bounds[30][0], max=bounds[30][1])
-            gmodel.set_param_hint('gamma8', value=p0[31], min=bounds[31][0], max=bounds[31][1])
-            gmodel.set_param_hint('m', value=p0[32], min=bounds[32][0], max=bounds[32][1])
-            gmodel.set_param_hint('b', value=p0[33], min=bounds[33][0], max=bounds[33][1])
+
+        gmodel.set_param_hint('m', value=p0[24], min=bounds[24][0], max=bounds[24][1])
+        gmodel.set_param_hint('b', value=p0[25], min=bounds[25][0], max=bounds[25][1])
+        # if index == 0:
+        #     gmodel.set_param_hint('m', value=p0[24], min=bounds[24][0], max=bounds[24][1])
+        #     gmodel.set_param_hint('b', value=p0[25], min=bounds[25][0], max=bounds[25][1])
+        # if index == 1:
+        #     gmodel.set_param_hint('a7', value=p0[24], min=bounds[24][0], max=bounds[24][1])
+        #     gmodel.set_param_hint('mu7', value=p0[25], min=bounds[25][0], max=bounds[25][1])
+        #     gmodel.set_param_hint('sigma7', value=p0[26], min=bounds[26][0], max=bounds[26][1])
+        #     gmodel.set_param_hint('m', value=p0[28], min=bounds[28][0], max=bounds[28][1])
+        #     gmodel.set_param_hint('b', value=p0[29], min=bounds[29][0], max=bounds[29][1])
+        # if index == 2:
+        #     gmodel.set_param_hint('a7', value=p0[24], min=bounds[24][0], max=bounds[24][1])
+        #     gmodel.set_param_hint('mu7', value=p0[25], min=bounds[25][0], max=bounds[25][1])
+        #     gmodel.set_param_hint('sigma7', value=p0[26], min=bounds[26][0], max=bounds[26][1])
+        #     gmodel.set_param_hint('a8', value=p0[28], min=bounds[28][0], max=bounds[28][1])
+        #     gmodel.set_param_hint('mu8', value=p0[29], min=bounds[29][0], max=bounds[29][1])
+        #     gmodel.set_param_hint('sigma8', value=p0[30], min=bounds[30][0], max=bounds[30][1])
+        #     gmodel.set_param_hint('m', value=p0[32], min=bounds[32][0], max=bounds[32][1])
+        #     gmodel.set_param_hint('b', value=p0[33], min=bounds[33][0], max=bounds[33][1])
 
         params = gmodel.make_params()
 
@@ -302,8 +369,8 @@ for index,dist in enumerate(dists):
         plt.plot(n_bin_centers,n_tof_hist)
         plt.plot(n_bin_centers,res.best_fit,'--',linewidth=2)
         for i in xrange(1,peaks[index]+1):
-            plt.plot(n_bin_centers,gaus_exp_convo(n_bin_centers,f['a'+str(i)],f['mu'+str(i)],f['sigma'+str(i)],f['gamma'+str(i)],f['m'],f['b']))
-        #plt.ylim(0,4e4)
+            plt.plot(n_bin_centers,gaus_exp_convo(n_bin_centers,f['a'+str(i)],f['mu'+str(i)],f['sigma'+str(i)],f['gamma'],f['m'],f['b']))
+        plt.ylim(0, 15e3)
 
 
 #        gmodel = lmfit.Model(gaus_exp_convo)
