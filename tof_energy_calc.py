@@ -51,22 +51,22 @@ def rel_vel(T,m):
 peak_params = pickle.load( open('peak_fit_params_11mev_gauss.p','r'))
 
 tof_n = [peak_params[0][0],peak_params[2][0],peak_params[4][0]]
-tof_n = [340.3, 323.8, 300.1]
+tof_n = [340.2, 323.8, 300.1]
 print tof_n
 
 # from gcrich -- gamma peaks (1) unknown, (2) collimator, (3) havar, (4) d cell backing
 tof_g1 = [peak_params[1][0],peak_params[3][0],peak_params[5][2]] # havar
-tof_g2 = [peak_params[1][2],peak_params[3][2],peak_params[5][0]] # d cell backing
+tof_g2 = [peak_params[1][2],peak_params[3][2],peak_params[5][0]] # d cell backing -- 10/28 this must actually be havar, not the backing
 sigma_g1 = [peak_params[1][1],peak_params[3][1],peak_params[5][3]] # sigma of gamma peak
 sigma_g2 = [peak_params[1][3],peak_params[3][3],peak_params[5][1]] # sigma of gamma peak
 print tof_g1, tof_g2
 
 # constants
-dist = [180.6,255.6,362.8] # dist from det to end of beam line
+dist = [180.6, 255.6, 362.8] # dist from det to end of beam line
 dcel_length = 2.8575 # cm
 det_size = 5.08 # cm, avg interaction depth in 0 deg det
 dcel_to_beamend = 145.2 # 146.58 measured by Ron Malone, 145.2 from our measurement (2-18)
-c = 29.9792 # cm/ns
+c = 29.97 # cm/ns
 mn = 939.552 # MeV neutron mass  
 E_n = 11.325 # MeV
 md = 1875.6 # MeV
@@ -76,25 +76,25 @@ E_d_34 = E_d_start - 0.103*0.75  # 3/4 through d cell
 
 # uncerts
 del_dist = np.sqrt((dcel_length/2.)**2 + (5.08/2.)**2) # 5.08cm len of det
-bunch_width = [2.355*s for s in sigma_g1] # fwhm of gamma peak gives estimation of bunch width
+bunch_width = [2.355*s for s in sigma_g2] # fwhm of gamma peak gives estimation of bunch width
 det_traverse = 5.08/rel_vel(E_n,mn)
-del_tof_rel = [np.sqrt(det_traverse**2 + b**2) for b in bunch_width]
-del_tof_nonrel = [np.sqrt((5.08/nonrel_vel(E_n,mn))**2 + b**2) for b in bunch_width]
+del_tof_rel = bunch_width #[np.sqrt(det_traverse**2 + b**2) for b in bunch_width]
+del_tof_nonrel = bunch_width #[np.sqrt((5.08/nonrel_vel(E_n,mn))**2 + b**2) for b in bunch_width]
 
-havar_peak = False
+havar_peak = True
 
 n_dist = [dcel_to_beamend + dcel_length/2. + det_size/2. + d for d in dist]
 if havar_peak:
-    #     gamma peak            gamma travel time from havar to detection      n peak  deuteron travel time to center of havar
-    tof_rel = [tof_g1[i] + (n_dist[i] + dcel_length/2.)/c - n - dcel_length/2./rel_vel(E_d_14,md) for i,n in enumerate(tof_n)] # havar gamma start
-    tof_nonrel = [tof_g1[i] + (n_dist[i] + dcel_length/2.)/c - n - dcel_length/2./nonrel_vel(E_d_14,md) for i,n in enumerate(tof_n)]
+    #  gamma peak,  gamma travel time from havar to detection   deuteron travel time to center of havar,  n peak
+    tof_rel = [tof_g2[i] + (n_dist[i] + dcel_length/2.)/c - dcel_length/2./rel_vel(E_d_14,md) - n for i,n in enumerate(tof_n)] # havar gamma start
+    tof_nonrel = [tof_g2[i] + (n_dist[i] + dcel_length/2.)/c - n - dcel_length/2./nonrel_vel(E_d_14,md) for i,n in enumerate(tof_n)]
 
     print dcel_length/2./rel_vel(E_d_14,md), dcel_length/2./nonrel_vel(E_d_14,md)
 
 else:
     #     gamma peak   gamma travel time from dcell stop to det    n peak  n travel time from dcell center to stop
-    tof_rel = [tof_g2[i] + (n_dist[i] - dcel_length/2.)/c + dcel_length/2./rel_vel(E_d_34,md) - n     for i,n in enumerate(tof_n)] # dcell stop gamma start
-    tof_nonrel = [tof_g2[i] + (n_dist[i] - dcel_length/2.)/c + dcel_length/2./nonrel_vel(E_d_34,md) - n     for i,n in enumerate(tof_n)]
+    tof_rel = [tof_g2[i] + (n_dist[i] - dcel_length/2.)/c + dcel_length/2./rel_vel(E_d_34, md) - n     for i,n in enumerate(tof_n)] # dcell stop gamma start
+    tof_nonrel = [tof_g2[i] + (n_dist[i] - dcel_length/2.)/c + dcel_length/2./nonrel_vel(E_d_34, md) - n     for i,n in enumerate(tof_n)]
 
 
 dists = ['176 cm', '235 cm', '284 cm']

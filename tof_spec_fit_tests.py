@@ -1,6 +1,5 @@
-''' Code for fitting tof spectra 
-    Neutron spectrum - set gauss==True for guassian fit, gauss==False for guassian convoluted with a leading exponential
-    Gamma spectrum - fit with double guassian
+''' Code for test multi gaussian fit to gamma peaks
+    Havar and beam stop peaks are overlapping -- didn't really get it to work, needed to move on
 '''
 
 
@@ -26,6 +25,11 @@ def double_gauss(x, *p):
     res = A1*np.exp(-(x-mu1)**2/(2.*sigma1**2)) + A2*np.exp(-(x-mu2)**2/(2.*sigma2**2))
     return res
 
+def quad_gauss(x, *p):
+    A1, mu1, sigma1, A2, mu2, sigma2, A3, mu3, sigma3, A4, mu4, sigma4 = p
+    res = A1*np.exp(-(x-mu1)**2/(2.*sigma1**2)) + A2*np.exp(-(x-mu2)**2/(2.*sigma2**2)) + A3*np.exp(-(x-mu3)**2/(2.*sigma3**2)) + A4*np.exp(-(x-mu4)**2/(2.*sigma4**2))
+    return res
+
 def get_range(vals, low_val, high_val):
     r = [i for i in vals if i>low_val and i<high_val]
     return r
@@ -36,8 +40,8 @@ def build_hist(vals, bin_no):
     return hist,bin_centers
 
 def print_stats():
-    print "\ngamma gaussian fit:\n  mu1 = "+str(coeff[1])+" ns\n  sigma1 = "+str(coeff[2]
-            )+" ns"+'\n  mu2 = '+str(coeff[4])+'\n  sigma2 = '+str(coeff[5])    
+    print "\ngamma gaussian fit:\n  mu1 = "+str(coeff[1])+" ns\n  sigma1 = "+str(coeff[2])+" ns"+'\n  mu2 = '+str(coeff[4])+'\n  sigma2 = '+str(coeff[5]
+            ) + "  \nmu3 = "+str(coeff[7])+" ns\n  sigma1 = "+str(coeff[8])+" ns"+'\n  mu4 = '+str(coeff[10])+'\n  sigma4 = '+str(coeff[11])
 
 save_dir = 'C:/Users/raweldon/Research/TUNL/git_programs/tof_codes/plots/'
 gauss = False # true if guass fit, flase if guass-exp convolution fit
@@ -62,7 +66,7 @@ if gauss:
 
     # values fit right side of spectrum (early arriving neutrons)
     n_ranges=[[339.7, 345.5],[323.3, 329.],[299.5, 307.5]]
-    g_ranges=[[400., 404.],[397., 402.5],[393.5, 398.]]
+    g_ranges=[[395., 406.],[393., 404],[391, 398.]]
     
     n_p0s = [[1.0, 340., 1.0, 1.0],[1.0, 324., 1.0, 1.0],[1.0, 300., 1.0, 1.0]]
     g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
@@ -71,15 +75,19 @@ if gauss:
 else:
     fit_type = 'gauss_exp_conv'
     n_ranges=[[331.5,346.5],[317.,331.],[290.5,307.5]]
-    g_ranges=[[400.,404.],[397.,402.5],[393.5,398.]]
+    #g_ranges=[[400.,404.],[397.,402.5],[392.0,395.5]]
+    g_ranges=[[395., 410.],[393., 408],[391, 402.]]
     n_p0s = [[1.0, 340., 1.0, 1.0],[1.0, 324., 1.0, 1.0],[1.0, 300., 1.0, 1.0]]
-    g_p0s = [[1.0, 401., 0.1, 1.0, 403.2, 0.1],[1.0, 398.3, 0.1, 1.0, 401., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+    g_p0s = [[1.0, 399., 0.1, 1.0, 401., 0.1, 1.0, 403.2, 0.1, 1.0, 406., 0.1],[1.0, 396., 0.1, 1.0, 398.3, 0.1, 1.0, 401., 0.1, 1.0, 403., 0.1],
+             [1.0, 394., 0.1, 1.0, 394.7, 0.1, 1.0, 397.3, 0.1, 1.0, 400., 0.1]]
 
-# 4.8 MeV
-#n_ranges=[[302.,307.],[269,275.],[240.5,246.]]
-#g_ranges=[[390.,410.],[398.,402.2],[394.,398.5]]
-#n_p0s = [[1.0, 302.5, 1.0],[1.0, 270., 1.0],[1.0,241.,1.0]]
-#g_p0s = [[1.0, 401., 0.1, 1.0, 403.5, 0.1],[1.0, 398.3, 0.1, 1.0, 400., 0.1],[1.0, 394.7, 0.1, 1.0, 397.3, 0.1]]
+    g_bounds = (((-np.inf, 397, -np.inf, -np.inf, 400, -np.inf, -np.inf, 402, -np.inf, -np.inf, 405, -np.inf), 
+                 (np.inf, 400, np.inf, np.inf, 402, np.inf, np.inf, 404, np.inf, np.inf, 407, np.inf)),
+                ((-np.inf, 394, -np.inf, -np.inf, 397, -np.inf, -np.inf, 400, -np.inf, -np.inf, 402, -np.inf), 
+                 (np.inf, 397, np.inf, np.inf, 399, np.inf, np.inf, 402, np.inf, np.inf, 404, np.inf)),
+                ((-np.inf, 392, -np.inf, -np.inf, 394, -np.inf, -np.inf, 396, -np.inf, -np.inf, 398, -np.inf), 
+                 (np.inf, 394.5, np.inf, np.inf, 396, np.inf, np.inf, 398, np.inf, np.inf, 402, np.inf)))
+
 
 means_stds, max_n_time = [], []
 for index,dist in enumerate(dists):
@@ -135,16 +143,24 @@ for index,dist in enumerate(dists):
 
     # gammas
     p0 = g_p0s[index]
-    coeff, var_matrix = curve_fit(double_gauss, g_bin_centers, g_tof_hist, p0=p0)
-    g_hist_fit = double_gauss(g_bin_centers, *coeff)
-    g_full_hist_fit = double_gauss(bin_centers, *coeff)
+    bounds = g_bounds[index]
+    #print p0
+    #print bounds
+    coeff, var_matrix = curve_fit(quad_gauss, g_bin_centers, g_tof_hist, p0=p0, bounds=bounds, max_nfev=10000)
+    g_hist_fit = quad_gauss(g_bin_centers, *coeff)
+    g_full_hist_fit = quad_gauss(bin_centers, *coeff)
     means_stds.append((coeff[1],coeff[2],coeff[4],coeff[5]))
     print_stats()
     
     # gamma plot
     fig1, ax1 = plt.subplots()
     plt.plot(g_bin_centers, g_tof_hist)
-    plt.plot(g_bin_centers, g_hist_fit) 
+    plt.plot(g_bin_centers, g_hist_fit, '--') 
+    plt.plot(g_bin_centers, gaussian(g_bin_centers, coeff[0], coeff[1], coeff[2]), '--')
+    plt.plot(g_bin_centers, gaussian(g_bin_centers, coeff[3], coeff[4], coeff[5]), '--')
+    plt.plot(g_bin_centers, gaussian(g_bin_centers, coeff[6], coeff[7], coeff[8]), '--')
+    plt.plot(g_bin_centers, gaussian(g_bin_centers, coeff[9], coeff[10], coeff[11]), '--')
+
     plt.ylabel('counts')
     plt.xlabel('time (ns)')
     plt.text(0.7,0.75,'$\mu_1 = $'+str(round(means_stds[1+2*index][0],3))+'\n$\sigma_1 =$ '+str(round(means_stds[1+2*index][1],3))+'\n$\mu_2 =$ '+
