@@ -74,6 +74,7 @@ del_tof_rel = [np.sqrt(det_traverse**2 + b**2) for b in bunch_width]
 del_tof_nonrel = [np.sqrt((5.08/nonrel_vel(E_n,mn))**2 + b**2) for b in bunch_width]
 
 dist_to_dcell = [dcel_to_beamend + dcel_length/2. + det_size/2. + d for d in dist] # for havar gamma start
+print [a + dcel_length/2. for a in dist_to_dcell]
 #     gamma peak            gamma travel time from havar to detection      n peak  deuteron travel time to center of havar
 tof_rel = [tof_g1[i] + (dist_to_dcell[i] + dcel_length/2.)/c - n - dcel_length/2./rel_vel(E_d_14,md) for i,n in enumerate(tof_n)] # havar gamma start
 tof_nonrel = [tof_g1[i] + (dist_to_dcell[i] + dcel_length/2.)/c - n - dcel_length/2./nonrel_vel(E_d_14,md) for i,n in enumerate(tof_n)]
